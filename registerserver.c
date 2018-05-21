@@ -8,7 +8,7 @@ int listenfd,connfd;
 struct sockaddr_in servaddr,cliaddr;
 socklen_t clilen;
 MYSQL* conn;
-char buff[100];
+//char buff[100];
 void mysqlconnect()
 {
 	conn=mysql_init(NULL);
@@ -47,18 +47,39 @@ void init()
 	Listen(listenfd,LISTENQ);
 	
 }
+void sig_childpid(int signo)
+{
+	pid_t pid;
+	int stat;
+	while((pid=waitpid(-1,&stat,WNOHANG))>0)
+	{
+		printf("child process %d terminated!\n",pid);
+	}
+}
 int main()
 {
+	pid_t childpid;
 	mysqlconnect();
 	init();
+	Signal(SIGCHLD,sig_childpid);
 	while(1)
 	{
 	clilen=sizeof(cliaddr);
 	connfd=Accept(listenfd,(SA*)&cliaddr,&clilen);
-	recv(connfd,buff,sizeof(buff),0);
-	registerin(buff);
-	bzero(&buff,sizeof(buff));
+		if((childpid=fork())==0)
+		{
+		char buff[100];
+		recv(connfd,buff,sizeof(buff),0);
+		registerin(buff);
+		bzero(&buff,sizeof(buff));
+		exit(0);
+		}
 	Close(connfd);
 	}
 	
 }
+
+
+
+
+
