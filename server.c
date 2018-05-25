@@ -2,12 +2,14 @@
 #include<pthread.h>
 #include<mysql/mysql.h>
 #include<time.h>
-
+#include<string.h>
 int maxsize=100;
 int socketfd[100];
 int listenfd;
 int nowconnect=0;
 MYSQL* conn;
+MYSQL_RES* res;
+MYSQL_ROW row;
 struct sockaddr_in servaddr;
 void mysqlconnection()
 {
@@ -25,6 +27,35 @@ void init()
 	Bind(listenfd,(SA*)&servaddr,sizeof(servaddr));
 	Listen(listenfd,100);
 		
+}
+int login(int fd)
+{
+	char	temp[100];
+	char str1[7]={};
+	char str2[7]={};
+	recv(fd,temp,sizeof(temp),0);
+	for(int i=0;i<strlen(temp);i++)
+	{
+		str1[i]=temp[i];
+		str2[i]=temp[i+6];
+	}
+	str1[6]=0;
+	str2[6]=0;
+	printf("%s\n",str1);
+	printf("%s\n",str2);
+	int select=mysql_query(conn,"select *from account");
+	res=mysql_store_result(conn);
+	while(row=mysql_fetch_row(res))
+	{
+		int t=0;
+			if((strcmp(str1,row[t])==0)&&strcmp(str2,row[t+1])==0)
+			{
+				char buff[]="登录成功!";
+				send(fd,buff,strlen(buff),0);
+				return 1;
+			}
+	}
+	return 0;
 }
 void SendMsgToAll(char* buf)
 {
@@ -86,6 +117,11 @@ void service()
 			char* str="当前连接数满了，请过会再连接!";
 			send(fd,str,strlen(str),0);
 			close(fd);
+		}
+		if((login(fd))!=1)
+		{
+			Close(fd);
+			continue;
 		}
 		for(int i=0;i<maxsize;i++)
 			if(socketfd[i]==0)

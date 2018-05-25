@@ -6,7 +6,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <pthread.h>
-
 int sockfd;//客户端socket
 //char* IP = "127.0.0.1";//服务器的IP
 short PORT = 6666;//服务器服务端口
@@ -24,7 +23,31 @@ void init(){
     }
     printf("客户端启动成功\n");
 }
-
+int login()
+{
+	char str1[7]={};
+	char str2[7]={};
+	char result[100]={};
+	printf("请输入账户:\n");
+	scanf("%s",str1);
+	printf("请输入密码:\n");
+	scanf("%s",str2);
+	send(sockfd,str1,strlen(str1),0);
+	send(sockfd,str1,strlen(str2),0);
+	recv(sockfd,result,sizeof(result),0);
+	if(strcmp(result,"登录成功!")==0)
+	{
+		printf("登陆成功！\n");
+		return 1;
+	}
+	else
+	{
+		printf("帐号或密码错误，重新登录!\n");
+		exit(0);
+	}
+	
+	
+}
 void start(){
     pthread_t id;
     void* recv_thread(void*);
@@ -62,6 +85,6 @@ int main(){
     init();
     printf("请输入您的名字：");
     scanf("%s",name);
-    start();
+    if((login())==1)start();
     return 0;
 }
