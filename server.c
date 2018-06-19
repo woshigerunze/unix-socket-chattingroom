@@ -30,25 +30,30 @@ void init()
 }
 int login(int fd)
 {
-	char	temp[100];
-	char str1[7]={};
-	char str2[7]={};
-	recv(fd,temp,sizeof(temp),0);
-	for(int i=0;i<strlen(temp);i++)
-	{
-		str1[i]=temp[i];
-		str2[i]=temp[i+6];
-	}
-	str1[6]=0;
-	str2[6]=0;
-	printf("%s\n",str1);
-	printf("%s\n",str2);
+	char	passname[100]={};
+	char	password[100]={};
+	recv(fd,passname,sizeof(passname),0);
+	recv(fd,password,sizeof(password),0);
+	//passname[strlen(passname)-1]=0;
+	//password[strlen(password)-1]=0;
+	//char str1[7]={};
+	//char str2[7]={};
+	//recv(fd,temp,sizeof(temp),0);
+	//for(int i=0;i<strlen(temp);i++)
+	//{
+	//	str1[i]=temp[i];
+	//	str2[i]=temp[i+6];
+	//}
+	//str1[6]=0;
+	//str2[6]=0;
+	printf("%s\n",passname);
+	printf("%s\n",password);
 	int select=mysql_query(conn,"select *from account");
 	res=mysql_store_result(conn);
 	while(row=mysql_fetch_row(res))
 	{
 		int t=0;
-			if((strcmp(str1,row[t])==0)&&strcmp(str2,row[t+1])==0)
+			if((strcmp(passname,row[t])==0)&&strcmp(password,row[t+1])==0)
 			{
 				char buff[]="登录成功!";
 				send(fd,buff,strlen(buff),0);

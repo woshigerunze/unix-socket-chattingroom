@@ -25,15 +25,16 @@ void init(){
 }
 int login()
 {
-	char str1[7]={};
-	char str2[7]={};
+	char str1[100]={};
+	char str2[100]={};
 	char result[100]={};
 	printf("请输入账户:\n");
 	scanf("%s",str1);
 	printf("请输入密码:\n");
 	scanf("%s",str2);
 	send(sockfd,str1,strlen(str1),0);
-	send(sockfd,str1,strlen(str2),0);
+	sleep(1);
+	send(sockfd,str2,strlen(str2),0);
 	recv(sockfd,result,sizeof(result),0);
 	if(strcmp(result,"登录成功!")==0)
 	{
