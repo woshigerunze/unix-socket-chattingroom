@@ -19,15 +19,12 @@ void mysqlconnect()
 	}
 	
 }
-void registerin(char* buff)
+void registerin(int connfd)
 {
-	char temp1[7]={};
-	char temp2[7]={};
-	for(int i=0;i<6;i++)
-	{
-		temp1[i]=buff[i];
-		temp2[i]=buff[i+6];
-	}
+	char temp1[100]={};
+	char temp2[100]={};
+	recv(connfd,temp1,sizeof(temp1),0);
+	recv(connfd,temp2,sizeof(temp2),0);
 	char func[100];
 	char tickschar[100];
 	time_t ticks;
@@ -68,10 +65,10 @@ int main()
 	connfd=Accept(listenfd,(SA*)&cliaddr,&clilen);
 		if((childpid=fork())==0)
 		{
-		char buff[100];
-		recv(connfd,buff,sizeof(buff),0);
-		registerin(buff);
-		bzero(&buff,sizeof(buff));
+		//char buff[100];
+		//recv(connfd,buff,sizeof(buff),0);
+		registerin(connfd);
+		//bzero(&buff,sizeof(buff));
 		exit(0);
 		}
 	Close(connfd);

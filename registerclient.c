@@ -20,6 +20,7 @@ int main()
 	printf("请输入密码:\n");
 	scanf("%s",password);
 	send(sockfd,passname,strlen(passname),0);
+	sleep(1);
 	send(sockfd,password,strlen(password),0);
 	exit(0);
 }
